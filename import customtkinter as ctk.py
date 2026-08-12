@@ -1,0 +1,194 @@
+import customtkinter
+import sys
+from tkinter import filedialog
+from PIL import Image
+wallpaper_img = customtkinter.CTkImage(light_image=Image.open(r"C:\Users\yurib\OneDrive\Рабочий стол\DOS-os\wallpaper.jpg"), size=(1920, 1080))
+text_content = "nothing"
+current_path = None
+
+
+
+if sys.platform.startswith("win"):
+    import ctypes
+    try:
+        ctypes.windll.shcore.SetProcessDpiAwareness(2) # Per-monitor DPI aware
+    except Exception:
+        try:
+            ctypes.windll.user32.SetProcessDPIAware() # Fallback for older Windows
+        except Exception:
+            pass
+
+
+def load_file():
+    global current_path, saved_text  # Даем функциям доступ к переменным
+    path = filedialog.askopenfilename(filetypes=[("Text Files", "*.txt")])
+    if path:
+        current_path = path
+        with open(path, "r", encoding="utf-8") as file:
+            saved_text = file.read()
+        
+        textboxforappone.delete("1.0", "end")
+        textboxforappone.insert("1.0", saved_text)
+        print(f"Путь сохранен в переменную: {current_path}")
+
+def openapp1(): #открытие закрытие фунц блокнот
+    if not app1.winfo_viewable():
+        app1.place(x=100, y=100)
+        textboxforappone.delete("1.0", "end")
+    else:
+        app1.place_forget()
+
+
+
+
+
+
+
+app = customtkinter.CTk()
+app.title("DOS-os")
+app.attributes("-fullscreen", True)
+app.geometry("1920x1080")
+app.grid_rowconfigure(0, weight=1)
+app.grid_columnconfigure(0, weight=1)
+app.configure(fg_color="gray14")
+
+
+#desktop
+desktop = customtkinter.CTkFrame(app, fg_color="#1D6369", bg_color="gray14", corner_radius=8)
+desktop.grid(sticky="nsew", row=0, column=0)
+desktop.grid_rowconfigure(0,weight=1)
+desktop.grid_rowconfigure(2,weight=0)
+desktop.grid_columnconfigure(0, weight=1)
+desktop.grid_columnconfigure(2, weight=5)
+
+
+
+
+
+
+
+
+#таскбар
+taskbar = customtkinter.CTkFrame(app,fg_color="#352E2E", corner_radius=8, bg_color="gray14", height=50)
+taskbar.grid(sticky="ew", row=1, column=0)
+taskbar.grid_columnconfigure(0, weight=2)
+taskbar.grid_columnconfigure(2, weight=6)
+
+background = customtkinter.CTkLabel(desktop, text="", image=wallpaper_img)
+background.place(x=0, y=0, relwidth=1, relheight=1)
+
+
+
+
+#фрейм меню старт
+startmenu = customtkinter.CTkFrame(desktop, fg_color="#c1b461", corner_radius=10,width=600,height=500)
+
+startmenu.rowconfigure(0,weight=3)
+startmenu.rowconfigure(2, weight=6)
+startmenu.columnconfigure(0, weight=1)
+startmenu.columnconfigure(2, weight=3)
+startmenu.grid_propagate(False)
+
+def menuopenkey(event):
+    if not startmenu.winfo_viewable():
+        startmenu.place(x=10, rely=1.0, y=-10, anchor="sw")
+    else:
+        startmenu.place_forget()
+        
+
+app.bind("<Escape>", menuopenkey)
+
+def menuopen():
+    if not startmenu.winfo_viewable():
+        startmenu.place(x=10, rely=1.0, y=-10, anchor="sw")
+    else:
+        startmenu.place_forget()
+
+#кнопка старт
+startmenubutton = customtkinter.CTkButton(taskbar, width=50, height=50, fg_color="#a45c5c", hover_color="#8b4747", text="🖳", font=("Arial", 36), command=menuopen)
+startmenubutton.grid(row=0, column=1, sticky="w")
+
+
+apponestartmenubutton = customtkinter.CTkButton(desktop, width=100, height=100, fg_color="#41433a", command=openapp1, text="notepad", font=("arial", 24)) # кнопка для блокнота в меню старт
+apponestartmenubutton.grid(row=0, column=1)
+
+#приложение1 блокнот
+app1 = customtkinter.CTkFrame(desktop, width=250, height=250, fg_color="transparent", corner_radius=0, border_width=0)
+titlebar = customtkinter.CTkFrame(app1, height=30, width=250, fg_color="#4e3f3f", corner_radius=0, border_width=0)
+titlebar.grid(column=0, row=0, sticky="ensw")
+app1.grid_propagate(False)
+titlebar.grid_propagate(False)
+
+
+        
+
+
+def save_text():
+    text_content = textboxforappone.get("1.0", "end-1c")
+
+    file_path = filedialog.asksaveasfilename(
+        defaultextension=".txt",
+        filetypes=[(".txt", "*.txt"), ("*", "*.*")]
+    )
+    
+    if file_path:
+        with open(file_path, "w", encoding="utf-8") as file:
+            file.write(text_content)
+
+apponestartmenubutton = customtkinter.CTkButton(startmenu, width=100, height=100, fg_color="#41433a", command=openapp1, text="notepad", font=("arial", 24)) # кнопка для блокнота в меню старт
+apponestartmenubutton.grid(row=1, column=1)
+
+desktop.rowconfigure(1, weight=2)
+desktop.columnconfigure(1, weight=1)
+titlebar.rowconfigure(1, weight=1)
+activate_scrollbars=True
+textboxforappone = customtkinter.CTkTextbox(app1, wrap="word", corner_radius=0, border_width=0 )
+textboxforappone.grid(row=1, column=0, sticky="nsew")
+
+closebuttonappone = customtkinter.CTkButton(titlebar, width=30, height=30, command=openapp1, fg_color="#41433a", text="✖", corner_radius=0)
+closebuttonappone.grid(row=0, column=0, sticky="nsew")
+nameappone = customtkinter.CTkLabel(titlebar, text="notepad", height=30, width=218, pady=0, padx=0)
+nameappone.grid(row=0, column=1, sticky="nsew")
+
+downtitlebar = customtkinter.CTkFrame(app1, fg_color="#4e3f3f")
+downtitlebar.grid(row=2, column=0, sticky="nsew")
+
+downtitlebarsavebutton = customtkinter.CTkButton(downtitlebar, text="save", command=save_text, width=30, height=28, fg_color="#41433a")
+downtitlebarsavebutton.grid(row=0, column=0)
+
+downtitlebarsavebutton = customtkinter.CTkButton(downtitlebar, text="load", command=load_file, width=30, height=28, fg_color="#41433a")
+downtitlebarsavebutton.grid(row=0, column=1)
+
+app1.drag_data = {"x": 0, "y": 0}
+
+def start_drag(event): #двиганье окна
+    app1.drag_data["x"] = event.x
+    app1.drag_data["y"] = event.y
+
+def move_window(event):
+    deltax = event.x - app1.drag_data["x"]
+    deltay = event.y - app1.drag_data["y"]
+    
+    new_x = app1.winfo_x() + deltax
+    new_y = app1.winfo_y() + deltay
+    
+    app1.place(x=new_x, y=new_y)
+
+nameappone.bind("<Button-1>", start_drag)
+nameappone.bind("<B1-Motion>", move_window)
+
+
+background = customtkinter.CTkLabel(app, text="")
+background
+
+
+
+
+
+
+
+
+
+
+
+app.mainloop()
