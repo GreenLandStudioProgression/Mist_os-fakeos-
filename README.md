@@ -21,4 +21,4 @@ PIL:
 pip install pillow
 ```
 than you can download the os
-the version is still alpha 1.3
+the version is still alpha 1.3, i have alpha 1.4 that added multi window and resizing but it is still in development!
